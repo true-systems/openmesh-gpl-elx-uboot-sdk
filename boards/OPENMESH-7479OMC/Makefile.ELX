@@ -1,0 +1,12 @@
+PROFILE_DIR = $(shell pwd)
+#PROFILE_BASENAME = atheros
+PROFILE_BASENAME = ralink
+
+UBOOT_TARGET = $(PROFILE_DIR)/../../Atheros_Uboot_1.1.x
+MAKEFILE_DIR = $(PROFILE_DIR)/..
+MAKEFILE_PATH = $(MAKEFILE_DIR)/Makefile.main
+BOARD_TYPE=$(BOARD_TYPE)
+#BUILD_CONFIG=$(BUILD_CONFIG)
+#export BUILD_CONFIG=_ap136_bootrom
+
+include $(MAKEFILE_PATH)

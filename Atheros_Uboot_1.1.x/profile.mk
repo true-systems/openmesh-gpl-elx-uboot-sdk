@@ -1,0 +1,1 @@
+/home/jim/ELX_Uboot_sdk_20161201/boards/OPENMESH-7479OMC/profile.mk

@@ -1,0 +1,66 @@
+#######################################################################
+default:
+	@echo
+	@echo "     _____ _     __   __         "
+	@echo "    |  ___| |    \ \ / /         "
+	@echo "    | |__ | |     \ V /          "
+	@echo "    |  __|| |     /   \          "
+	@echo "    | |___| |____/ /^\ \         "
+	@echo "    \____/\_____/\/   \/         "
+	@echo "    _____________________________"
+	@echo "    Options: "
+	@echo "    init          	- Link config file "
+	@echo "    make-uboot		- Make uboot"
+	@echo "    clean-uboot		- Clean uboot"
+	@echo
+
+TOP_DIR=$(UBOOT_TARGET)
+VENDOR=$(PROFILE_DIR)
+
+init:
+	@echo $(TOP_DIR)
+	rm $(TOP_DIR)/u*.bin $(TOP_DIR)/u*.img $(TOP_DIR)/.config $(TOP_DIR)/func.mk $(TOP_DIR)/profile.mk $(TOP_DIR)/elx_ver.h $(TOP_DIR)/autoconf.h -rf
+	ln -s $(VENDOR)/def_uboot_config $(TOP_DIR)/.config
+	ln -s $(VENDOR)/autoconf.h $(TOP_DIR)/autoconf.h
+ifeq ($(findstring ralink,$(PROFILE_BASENAME)),ralink)
+	ln -s $(MAKEFILE_DIR)/rt_func.mk $(TOP_DIR)/func.mk
+else
+	exit 1
+endif
+	ln -s $(VENDOR)/profile.mk $(TOP_DIR)/profile.mk
+	ln -s $(VENDOR)/elx_ver.h $(TOP_DIR)/elx_ver.h
+
+build_autover:
+
+autover-uboot:build_autover
+
+
+include $(VENDOR)/profile.mk
+
+_config_init:
+	rm $(TOP_DIR)/.config -rf
+	rm $(TOP_DIR)/*.bin -rf
+	rm $(TOP_DIR)/*.img -rf
+	rm $(TOP_DIR)/my_config.mk -rf
+	rm $(TOP_DIR)/include/ubootver.h -rf
+	ln -s $(VENDOR)/uboot_config $(TOP_DIR)/.config
+	ln -s $(VENDOR)/product_config.make $(TOP_DIR)/my_config.mk
+	ln -s $(VENDOR)/configs/ubootver.h $(TOP_DIR)/include/
+
+#
+#cd $(UBOOTDIR) && $(MAKEARCH) $(BOARD_TYPE)_config
+#cd $(UBOOTDIR) && $(MAKEARCH) all BUILD_DIR=$(TOPDIR)/build
+#@echo End Making uboot at `date`
+make-uboot: init autover-uboot
+	make -C $(TOP_DIR) -f Makefile clean
+ifneq ($(BOARD_CONFIG),)
+	make -C $(TOP_DIR) -f Makefile $(BOARD_CONFIG)
+endif
+	make -C $(TOP_DIR) -f Makefile 
+	@echo End Making uboot at `date`
+	ls -al /tftpboot/uboot.img
+
+clean-uboot:
+	make -C $(TOP_DIR) -f Makefile clean
+	rm $(TOP_DIR)/uboot.img -rf
+	rm $(TOP_DIR)/u-boot.bin -rf
